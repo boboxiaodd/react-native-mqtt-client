@@ -16,6 +16,10 @@ const connect = async (
   return MqttClient.connect(brokerUrl, options);
 };
 ```
+Persistence change memory to File
+```kt
+val persistence = MqttDefaultFilePersistence()
+```
 
 
 # @ecodevstack/react-native-mqtt-client
