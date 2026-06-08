@@ -1,14 +1,7 @@
 import { type TurboModule } from 'react-native';
-export interface ConnectOptions {
-    username: string;
-    password: string;
-    clientId: string;
-    cleanSession: boolean;
-    connectionTimeout: number;
-    keepAliveInterval: number;
-    isAutomaticReconnect: boolean;
-    maxReconnectDelay: number;
-}
+
+import {type ConnectOptions} from "./index";
+
 export interface Spec extends TurboModule {
     connect(brokerUrl: string, options?: ConnectOptions): Promise<string>;
     disconnect(): Promise<string>;
