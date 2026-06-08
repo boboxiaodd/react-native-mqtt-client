@@ -1,3 +1,23 @@
+# change:  add more options to connect only for Android
+```ts
+const connect = async (
+  brokerUrl: string,
+  options: {
+    username: string;
+    password: string;
+    clientId: string;
+    cleanSession: boolean;
+	connectionTimeout: number;
+	keepAliveInterval: number;
+	isAutomaticReconnect: boolean;
+	maxReconnectDelay: number;
+  },
+): Promise<string> => {
+  return MqttClient.connect(brokerUrl, options);
+};
+```
+
+
 # @ecodevstack/react-native-mqtt-client
 
 A native MQTT client for React Native (Android & iOS) built with the **New Architecture** (Turbo Modules + Codegen). Connect, publish, subscribe, and receive real-time messages from any MQTT broker.
