@@ -22,16 +22,31 @@ export interface MqttMessage {
  * Establishes a connection to an MQTT broker using the provided credentials.
  *
  * @param brokerUrl - The URL of the MQTT broker to connect to (e.g. "tcp://broker.hivemq.com:1883").
- * @param username - The username for authenticating with the MQTT broker.
- * @param password - The password for authenticating with the MQTT broker.
+ * @param options - The options for MQTT connection.
+ *  username: string;
+ *  password: string;
+ *  clientId: string;
+ *  cleanSession: boolean;
+ *  connectionTimeout: number;
+ *  keepAliveInterval: number;
+ *  isAutomaticReconnect: boolean;
+ *  maxReconnectDelay: number;
  * @returns A promise that resolves with a success message, or rejects with an error.
  */
 const connect = async (
   brokerUrl: string,
-  username: string,
-  password: string
+  options: {
+    username: string;
+    password: string;
+    clientId: string;
+    cleanSession: boolean;
+	  connectionTimeout: number;
+	  keepAliveInterval: number;
+	  isAutomaticReconnect: boolean;
+	  maxReconnectDelay: number;
+  },
 ): Promise<string> => {
-  return MqttClient.connect(brokerUrl, username, password);
+  return MqttClient.connect(brokerUrl, options);
 };
 
 /**
