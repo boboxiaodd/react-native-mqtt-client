@@ -3,6 +3,7 @@ package com.mqttclient
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
@@ -13,7 +14,7 @@ import org.eclipse.paho.client.mqttv3.MqttAsyncClient
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.eclipse.paho.client.mqttv3.MqttException
 import org.eclipse.paho.client.mqttv3.MqttMessage
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
+import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence
 import java.util.UUID
 
 class MqttClientModule(private val reactContext: ReactApplicationContext) :
@@ -45,24 +46,22 @@ class MqttClientModule(private val reactContext: ReactApplicationContext) :
     }
   }
 
-  override fun connect(brokerUrl: String, username: String, password: String, promise: Promise) {
+  override fun connect(brokerUrl: String, options: ReadableMap, promise: Promise) {
     try {
-      val clientId = "ReactNativeMqtt_" + UUID.randomUUID().toString().substring(0, 8)
-      val persistence = MemoryPersistence()
+      val clientId = options.getString("clientId")
+      val password = options.getString("password")?.toCharArray()
+      val persistence = MqttDefaultFilePersistence()
 
       mqttClient = MqttAsyncClient(brokerUrl, clientId, persistence)
 
       val options = MqttConnectOptions().apply {
-        isCleanSession = true
-        connectionTimeout = 30
-        keepAliveInterval = 60
-        isAutomaticReconnect = true
-        if (username.isNotEmpty()) {
-          userName = username
-        }
-        if (password.isNotEmpty()) {
-          setPassword(password.toCharArray())
-        }
+        isCleanSession = options.getBoolean("cleanSession")
+        connectionTimeout = options.getInt("connectionTimeout") //30 sec
+        keepAliveInterval = options.getInt("keepAliveInterval") //60 sec
+        isAutomaticReconnect = options.getBoolean("isAutomaticReconnect") //true
+        userName = options.getString("username")
+        setPassword(password)
+        maxReconnectDelay = options.getInt("maxReconnectDelay")  //Set the maximum time to wait between reconnects (millis sec)
       }
 
       mqttClient?.setCallback(object : MqttCallback {
