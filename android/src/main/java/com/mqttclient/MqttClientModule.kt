@@ -1,26 +1,30 @@
 package com.mqttclient
 
+import android.util.Log
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
+import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
 import org.eclipse.paho.client.mqttv3.IMqttToken
 import org.eclipse.paho.client.mqttv3.MqttCallback
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient
+import org.eclipse.paho.client.mqttv3.MqttClient
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.eclipse.paho.client.mqttv3.MqttException
 import org.eclipse.paho.client.mqttv3.MqttMessage
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence
 import java.util.UUID
 
 class MqttClientModule(private val reactContext: ReactApplicationContext) :
   NativeMqttClientSpec(reactContext) {
 
-  private var mqttClient: MqttAsyncClient? = null
+  private var mqttClient: MqttAndroidClient? = null
   private var listenerCount = 0
 
   companion object {
@@ -50,10 +54,10 @@ class MqttClientModule(private val reactContext: ReactApplicationContext) :
     try {
       val clientId = options?.getString("clientId") ?: ""
       val password = options?.getString("password")?.toCharArray()
-      val persistence = MqttDefaultFilePersistence()
-
-      mqttClient = MqttAsyncClient(brokerUrl, clientId, persistence)
-
+//      val persistence = MqttDefaultFilePersistence()
+      val persistence = MemoryPersistence()
+      Log.d("MQTT", "Connecting to brokerUrl=$brokerUrl with clientId=$clientId")
+      mqttClient = MqttAndroidClient(reactContext,brokerUrl, clientId , persistence)
       val options = MqttConnectOptions().apply {
         isCleanSession = options?.getBoolean("cleanSession") ?: true
         connectionTimeout = options?.getInt("connectionTimeout")  ?: 30 //30 sec
@@ -104,6 +108,7 @@ class MqttClientModule(private val reactContext: ReactApplicationContext) :
         }
       })
     } catch (e: MqttException) {
+      Log.e("MQTT", "MqttException reasonCode=${e.reasonCode}", e)
       val params = Arguments.createMap().apply {
         putString("error", e.message ?: "Connection error")
       }
