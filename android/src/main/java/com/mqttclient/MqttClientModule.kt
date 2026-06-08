@@ -46,22 +46,22 @@ class MqttClientModule(private val reactContext: ReactApplicationContext) :
     }
   }
 
-  override fun connect(brokerUrl: String, options: ReadableMap, promise: Promise) {
+  override fun connect(brokerUrl: String, options: ReadableMap?, promise: Promise) {
     try {
-      val clientId = options.getString("clientId")
-      val password = options.getString("password")?.toCharArray()
+      val clientId = options?.getString("clientId") ?: ""
+      val password = options?.getString("password")?.toCharArray()
       val persistence = MqttDefaultFilePersistence()
 
       mqttClient = MqttAsyncClient(brokerUrl, clientId, persistence)
 
       val options = MqttConnectOptions().apply {
-        isCleanSession = options.getBoolean("cleanSession")
-        connectionTimeout = options.getInt("connectionTimeout") //30 sec
-        keepAliveInterval = options.getInt("keepAliveInterval") //60 sec
-        isAutomaticReconnect = options.getBoolean("isAutomaticReconnect") //true
-        userName = options.getString("username")
+        isCleanSession = options?.getBoolean("cleanSession") ?: true
+        connectionTimeout = options?.getInt("connectionTimeout")  ?: 30 //30 sec
+        keepAliveInterval = options?.getInt("keepAliveInterval") ?: 60 //60 sec
+        isAutomaticReconnect = options?.getBoolean("isAutomaticReconnect") ?: true //true
+        userName = options?.getString("username") ?: ""
         setPassword(password)
-        maxReconnectDelay = options.getInt("maxReconnectDelay")  //Set the maximum time to wait between reconnects (millis sec)
+        maxReconnectDelay = options?.getInt("maxReconnectDelay") ?: 3000  //Set the maximum time to wait between reconnects (millis sec)
       }
 
       mqttClient?.setCallback(object : MqttCallback {
