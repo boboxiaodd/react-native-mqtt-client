@@ -1,5 +1,5 @@
 import { NativeEventEmitter, Platform } from 'react-native';
-import MqttClient from './NativeMqttClient';
+import MqttClient,{ConnectOptions} from './NativeMqttClient';
 
 const MqttEventEmitter = new NativeEventEmitter(
   Platform.OS !== 'web' ? (MqttClient as any) : undefined
@@ -35,16 +35,7 @@ export interface MqttMessage {
  */
 const connect = async (
   brokerUrl: string,
-  options: {
-    username: string;
-    password: string;
-    clientId: string;
-    cleanSession: boolean;
-	  connectionTimeout: number;
-	  keepAliveInterval: number;
-	  isAutomaticReconnect: boolean;
-	  maxReconnectDelay: number;
-  },
+  options: ConnectOptions,
 ): Promise<string> => {
   return MqttClient.connect(brokerUrl, options);
 };
